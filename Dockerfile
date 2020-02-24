@@ -1,10 +1,15 @@
-FROM i386/alpine:latest as base
+FROM --platform=$TARGETPLATFORM alpine:latest as base
 
 FROM base as build
 RUN apk --no-cache add bash g++
 COPY . /code
 WORKDIR /code
-RUN ./build.sh -s demo
+
+RUN if [ "$TARGETPLATFORM" = "linux/amd64" ] || [ "$TARGETPLATFORM" = "linux/386" ]; then \
+    ./build.sh -s demo; \
+    else \
+    ./build.sh -s ospi; \
+    fi
 
 FROM base
 RUN apk --no-cache add libstdc++ && \
@@ -19,6 +24,6 @@ COPY --from=build /code/OpenSprinkler /OpenSprinkler/OpenSprinkler
 
 VOLUME /data
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD [ "./OpenSprinkler" ]
