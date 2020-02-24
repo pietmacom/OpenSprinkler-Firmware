@@ -333,13 +333,8 @@ byte OpenSprinkler::iopts[] = {
 	0,
 	0,
 	0,
-#if defined(ARDUINO)	// on AVR, the default HTTP port is 80
-	80, // this and next byte define http port number
-	0,
-#else // on RPI/BBB/LINUX, the default HTTP port is 8080
 	144,// this and next byte define http port number
 	31,
-#endif
 	OS_HW_VERSION,
 	0,	// number of 8-station extension board. 0: no extension boards
 	1,	// the option 'sequential' is now retired
