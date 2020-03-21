@@ -1,0 +1,30 @@
+
+.PHONY: clean build run stop inspect
+
+IMAGE_NAME = mciupak/opensprinkler
+CONTAINER_NAME = opensprinkler
+
+build:
+	docker buildx build -t $(IMAGE_NAME) --load .
+
+release:
+	docker buildx build --platform linux/386,linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7 \
+		--build-arg VCS_REF=`git rev-parse --short HEAD` \
+		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
+		-t $(IMAGE_NAME) --push .
+
+run:
+	docker run -d --rm -p 8080:8080 -v $(shell pwd)/data:/data --name $(CONTAINER_NAME) $(IMAGE_NAME)
+
+inspect:
+	docker inspect $(CONTAINER_NAME)
+
+shell:
+	docker exec -it $(CONTAINER_NAME) /bin/sh
+
+stop:
+	docker stop $(CONTAINER_NAME)
+
+clean:
+	docker stop $(CONTAINER_NAME)
+	docker images | grep '$(IMAGE_NAME)' | awk '{print $$3}' | xargs docker rmi

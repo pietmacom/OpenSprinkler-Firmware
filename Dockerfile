@@ -16,14 +16,11 @@ RUN apk --no-cache add libstdc++ && \
     mkdir /OpenSprinkler && \
     mkdir -p /data/logs
 WORKDIR /OpenSprinkler
-RUN ln -s /data/stns.dat && \
-    ln -s /data/nvm.dat && \
-    ln -s /data/ifkey.txt && \
-    ln -s /data/logs
+
 COPY --from=build /code/OpenSprinkler /OpenSprinkler/OpenSprinkler
 
 VOLUME /data
 
 EXPOSE 8080
 
-CMD [ "./OpenSprinkler" ]
+CMD [ "./OpenSprinkler", "-d", "/data" ]

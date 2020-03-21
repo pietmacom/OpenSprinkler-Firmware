@@ -1443,15 +1443,15 @@ void write_log(byte type, ulong curr_time) {
 	
 #else // prepare log folder for RPI/BBB
 	struct stat st;
-	if(stat(get_filename_fullpath(LOG_PREFIX), &st)) {
-		if(mkdir(get_filename_fullpath(LOG_PREFIX), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH)) {
+	if(stat(LOG_PREFIX, &st)) {
+		if(mkdir(LOG_PREFIX, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH)) {
 			return;
 		}
 	}
 	FILE *file;
-	file = fopen(get_filename_fullpath(tmp_buffer), "rb+");
+	file = fopen(tmp_buffer, "rb+");
 	if(!file) {
-		file = fopen(get_filename_fullpath(tmp_buffer), "wb");
+		file = fopen(tmp_buffer, "wb");
 		if (!file)	return;
 	}
 	fseek(file, 0, SEEK_END);
@@ -1563,11 +1563,11 @@ void delete_log(char *name) {
 #else // delete_log implementation for RPI/BBB
 	if (strncmp(name, "all", 3) == 0) {
 		// delete the log folder
-		rmdir(get_filename_fullpath(LOG_PREFIX));
+		rmdir(LOG_PREFIX);
 		return;
 	} else {
 		make_logfile_name(name);
-		remove(get_filename_fullpath(tmp_buffer));
+		remove(tmp_buffer);
 	}
 #endif
 }
@@ -1668,6 +1668,22 @@ void perform_ntp_sync() {
 
 #if !defined(ARDUINO) // main function for RPI/BBB
 int main(int argc, char *argv[]) {
+
+	char *datadir = get_runtime_path();
+
+	int opt;
+	while(-1 != (opt = getopt(argc, argv, "d:"))) {
+		switch(opt) {
+		case 'd':
+			datadir = optarg;
+			break;
+		default:
+			break;
+		}
+	}
+
+	chdir(datadir);
+
 	do_setup();
 
 	while(true) {
