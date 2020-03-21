@@ -61,13 +61,6 @@ char* get_runtime_path() {
 	return path;
 }
 
-char* get_filename_fullpath(const char *filename) {
-	static char fullpath[PATH_MAX];
-	strcpy(fullpath, get_runtime_path());
-	strcat(fullpath, filename);
-	return fullpath;
-}
-
 void delay(ulong howLong)
 {
 	struct timespec sleeper, dummy ;
@@ -205,10 +198,10 @@ void write_to_file(const char *fn, const char *data, ulong size, ulong pos, bool
 
 	FILE *file;
 	if(trunc) {
-		file = fopen(get_filename_fullpath(fn), "wb");
+		file = fopen(fn, "wb");
 	} else {
-		file = fopen(get_filename_fullpath(fn), "r+b");
-		if(!file) file = fopen(get_filename_fullpath(fn), "wb");
+		file = fopen(fn, "r+b");
+		if(!file) file = fopen(fn, "wb");
 	}
 	if(!file)  return;
 	fseek(file, pos, SEEK_SET);
@@ -252,7 +245,7 @@ void read_from_file(const char *fn, char *data, ulong maxsize, ulong pos) {
 #else
 
 	FILE *file;
-	file = fopen(get_filename_fullpath(fn), "rb");
+	file = fopen(fn, "rb");
 	if(!file) {
 		data[0] = 0;
 		return;
@@ -290,7 +283,7 @@ void remove_file(const char *fn) {
 
 #else
 
-	remove(get_filename_fullpath(fn));
+	remove(fn);
 
 #endif
 }
@@ -308,7 +301,7 @@ bool file_exists(const char *fn) {
 #else
 
 	FILE *file;
-	file = fopen(get_filename_fullpath(fn), "rb");
+	file = fopen(fn, "rb");
 	if(file) {fclose(file); return true;}
 	else {return false;}
 
@@ -339,7 +332,7 @@ void file_read_block(const char *fn, void *dst, ulong pos, ulong len) {
 
 #else
 
-	FILE *fp = fopen(get_filename_fullpath(fn), "rb");
+	FILE *fp = fopen(fn, "rb");
 	if(fp) {
 		fseek(fp, pos, SEEK_SET);
 		fread(dst, 1, len, fp);
@@ -372,9 +365,9 @@ void file_write_block(const char *fn, const void *src, ulong pos, ulong len) {
 
 #else
 
-	FILE *fp = fopen(get_filename_fullpath(fn), "rb+");
+	FILE *fp = fopen(fn, "rb+");
 	if(!fp) {
-		fp = fopen(get_filename_fullpath(fn), "wb+");
+		fp = fopen(fn, "wb+");
 	}
 	if(fp) {
 		fseek(fp, pos, SEEK_SET); //this fails silently without the above change
@@ -414,7 +407,7 @@ void file_copy_block(const char *fn, ulong from, ulong to, ulong len, void *tmp)
 
 #else
 
-	FILE *fp = fopen(get_filename_fullpath(fn), "rb+");
+	FILE *fp = fopen(fn, "rb+");
 	if(!fp) return;
 	fseek(fp, from, SEEK_SET);
 	fread(tmp, 1, len, fp);
@@ -460,7 +453,7 @@ byte file_cmp_block(const char *fn, const char *buf, ulong pos) {
 
 #else
 
-	FILE *fp = fopen(get_filename_fullpath(fn), "rb");
+	FILE *fp = fopen(fn, "rb");
 	if(fp) {
 		fseek(fp, pos, SEEK_SET);
 		char c = fgetc(fp);
