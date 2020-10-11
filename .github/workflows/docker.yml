@@ -27,7 +27,7 @@ jobs:
         name: Prepare
         id: prep
         run: |
-          DOCKER_IMAGE=mciupak/OpenSprinkler-Firmware
+          DOCKER_IMAGE=mciupak/opensprinkler
           VERSION=noop
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             VERSION=${GITHUB_REF#refs/tags/}
