@@ -1,4 +1,4 @@
-FROM --platform=$TARGETPLATFORM alpine:latest as base
+FROM --platform=$TARGETPLATFORM alpine:3.18 as base
 
 FROM base as build
 RUN apk --no-cache add bash g++ mosquitto-dev
